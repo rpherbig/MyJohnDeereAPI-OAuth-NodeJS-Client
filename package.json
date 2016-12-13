@@ -1,0 +1,14 @@
+{
+  "name": "jd-node-oauth",
+  "version": "0.0.0",
+  "description": "Sample app to demonstrate how the JD platform can be accessed via OAuth with Node.js",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "express": "^4.14.0",
+    "oauth": "^0.9.14"
+  }
+}
