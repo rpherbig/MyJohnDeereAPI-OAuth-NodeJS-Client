@@ -162,6 +162,50 @@ app.get('/sampleRequest', function(req, res) {
     });
 });
 
+/*
+ * 5. Local endpoint to demonstrate how to perform Create File in a MyJohnDeere organization.Below endpoint just picks up the first organization
+ * user has access to upload a file and creates (POST) a spot to upload (PUT) a file.
+ */
+app.get('/createFile', function(req, res) {
+    console.log('----- Doing Create File Request -----');
+    var body = {name: 'fileName.zip'};
+
+    oAuthSession.get(config.platformBaseUri, tokens.accessToken, tokens.accessTokenSecret, function(error, responseData, result) {
+        apiCatalog = JSON.parse(responseData);
+
+        var organizationsLink = apiCatalog.links.find(function(link) {
+            return link.rel === 'organizations';
+        });
+
+        var fileUploadLink = function (link) {
+            return link.rel === 'uploadFile';
+        };
+        oAuthSession.get(organizationsLink.uri+';count=100', tokens.accessToken, tokens.accessTokenSecret, function(error, responseData, result) {
+            var organizations = JSON.parse(responseData).values;
+
+            var org = organizations.find(function (organization) {
+                var uploadFileLink = organization.links.find(fileUploadLink)
+                if(uploadFileLink) {
+                    return true
+                }
+                return false;
+
+            });
+            if(org) {
+                console.log('Creating a file with =>' + org.links.find(fileUploadLink).uri);
+                oAuthSession.post(org.links.find(fileUploadLink).uri, tokens.accessToken, tokens.accessTokenSecret, JSON.stringify(body),
+                    'application/vnd.deere.axiom.v3+json', function (error, responseData, result) {
+                        console.log('File Created =>' + result.headers.location)
+                        res.end();
+                    });
+            }
+            else{
+                console.log('User does not have an organization he can upload files!!')
+            }
+        });
+    });
+});
+
 app.listen(3000);
 
 console.log('listening on http://localhost:3000');
