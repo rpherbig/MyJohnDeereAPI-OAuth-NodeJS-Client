@@ -23,11 +23,11 @@ var config = {
         'Accept': 'application/vnd.deere.axiom.v3+json'
     },
 
-    'clientKey': 'PUT_CLIENT_KEY_HERE',
-    'clientSecret': 'PUT_CLIENT_SECRET_HERE',
+    clientKey: 'PUT_CLIENT_KEY_HERE',
+    clientSecret: 'PUT_CLIENT_SECRET_HERE',
 
-    'platformBaseUri': 'https://sandboxapi.deere.com/platform',
-    'authorizeCallbackUri': 'http://localhost:3000/callback'
+    platformBaseUri: 'https://sandboxapi.deere.com/platform',
+    authorizeCallbackUri: 'http://localhost:3000/callback'
 };
 var oAuthSession;
 var apiCatalog;
@@ -170,16 +170,22 @@ app.get('/uploadFile', function(req, res) {
     console.log('----- Doing Create File Request -----');
     var body = {name: 'fileName.zip'};
 
-    function uploadFile(location, tokens) {
-        console.log('Uploading file with =>' + location);
-        fs.readFile('./RX.zip', function (err, data) {
-            oAuthSession.put(location, tokens.accessToken, tokens.accessTokenSecret, data,
-                'application/octet-stream', function (error, responseData, result) {
-                    console.log('File Uploaded =>' + result.statusCode)
-                    res.end();
-                });
+    var uploadFile = function (error, responseData, result) {
+        if(!error) {
+            var location = result.headers.location;
+            console.log('Uploading file with =>' + location);
+            fs.readFile('./RX.zip', function (err, data) {
+                oAuthSession.put(location, tokens.accessToken, tokens.accessTokenSecret, data,
+                    'application/octet-stream', function (error, responseData, result) {
+                        console.log('File Uploaded =>' + result.statusCode)
+                        res.end();
+                    });
 
-        })
+            })
+        }
+        else {
+            console.log('Error in creating file'+ error)
+        }
     }
     oAuthSession.get(config.platformBaseUri, tokens.accessToken, tokens.accessTokenSecret, function(error, responseData, result) {
         apiCatalog = JSON.parse(responseData);
@@ -206,12 +212,7 @@ app.get('/uploadFile', function(req, res) {
                 var uri = org.links.find(fileUploadLink).uri;
                 console.log('Creating a file with =>' + uri);
                 oAuthSession.post(uri, tokens.accessToken, tokens.accessTokenSecret, JSON.stringify(body),
-                    'application/vnd.deere.axiom.v3+json', function (error, responseData, result) {
-                        var location = result.headers.location;
-                        console.log('File Created =>' + location)
-                        res.end();
-                        uploadFile(location, tokens);
-                });
+                    'application/vnd.deere.axiom.v3+json', uploadFile);
             }
             else{
                 console.log('User does not have an organization he can upload files!!')
