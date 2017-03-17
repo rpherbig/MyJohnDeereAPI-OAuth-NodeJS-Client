@@ -9,6 +9,7 @@
   "devDependencies": {},
   "dependencies": {
     "express": "^4.14.0",
+    "fs-extra": "^2.1.2",
     "oauth": "^0.9.14"
   }
 }

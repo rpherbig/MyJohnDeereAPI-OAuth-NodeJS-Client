@@ -2,11 +2,12 @@
 
 const express = require('express');
 const OAuth = require('oauth').OAuth;
+const fs = require('fs-extra');
 
 var config = {
-    'oAuthVersion': '1.0',
-    'oAuthSignatureMethod': 'HMAC-SHA1',
-    'oAuthNonceSize': undefined,
+    oAuthVersion: '1.0',
+    oAuthSignatureMethod: 'HMAC-SHA1',
+    oAuthNonceSize: undefined,
 
     /*
      * IMPORTANT: John Deere specific accept header has to be set to have oAuth working with the MyJohnDeere
@@ -18,17 +19,16 @@ var config = {
      * endpoint in another content type you would need to establish another oauth session for that content type.
      * (Or use another library or modify the library)
      */
-    'oAuthCustomHeaders': {
+    oAuthCustomHeaders: {
         'Accept': 'application/vnd.deere.axiom.v3+json'
     },
 
     'clientKey': 'PUT_CLIENT_KEY_HERE',
     'clientSecret': 'PUT_CLIENT_SECRET_HERE',
 
-    'platformBaseUri': 'https://api.deere.com/platform',
+    'platformBaseUri': 'https://sandboxapi.deere.com/platform',
     'authorizeCallbackUri': 'http://localhost:3000/callback'
 };
-
 var oAuthSession;
 var apiCatalog;
 
@@ -164,12 +164,23 @@ app.get('/sampleRequest', function(req, res) {
 
 /*
  * 5. Local endpoint to demonstrate how to perform Create File in a MyJohnDeere organization.Below endpoint just picks up the first organization
- * user has access to upload a file and creates (POST) a spot to upload (PUT) a file.
+ * user has access to upload a file and creates (POST) a spot and upload (PUT) a file.
  */
-app.get('/createFile', function(req, res) {
+app.get('/uploadFile', function(req, res) {
     console.log('----- Doing Create File Request -----');
     var body = {name: 'fileName.zip'};
 
+    function uploadFile(location, tokens) {
+        console.log('Uploading file with =>' + location);
+        fs.readFile('./RX.zip', function (err, data) {
+            oAuthSession.put(location, tokens.accessToken, tokens.accessTokenSecret, data,
+                'application/octet-stream', function (error, responseData, result) {
+                    console.log('File Uploaded =>' + result.statusCode)
+                    res.end();
+                });
+
+        })
+    }
     oAuthSession.get(config.platformBaseUri, tokens.accessToken, tokens.accessTokenSecret, function(error, responseData, result) {
         apiCatalog = JSON.parse(responseData);
 
@@ -192,12 +203,15 @@ app.get('/createFile', function(req, res) {
 
             });
             if(org) {
-                console.log('Creating a file with =>' + org.links.find(fileUploadLink).uri);
-                oAuthSession.post(org.links.find(fileUploadLink).uri, tokens.accessToken, tokens.accessTokenSecret, JSON.stringify(body),
+                var uri = org.links.find(fileUploadLink).uri;
+                console.log('Creating a file with =>' + uri);
+                oAuthSession.post(uri, tokens.accessToken, tokens.accessTokenSecret, JSON.stringify(body),
                     'application/vnd.deere.axiom.v3+json', function (error, responseData, result) {
-                        console.log('File Created =>' + result.headers.location)
+                        var location = result.headers.location;
+                        console.log('File Created =>' + location)
                         res.end();
-                    });
+                        uploadFile(location, tokens);
+                });
             }
             else{
                 console.log('User does not have an organization he can upload files!!')
