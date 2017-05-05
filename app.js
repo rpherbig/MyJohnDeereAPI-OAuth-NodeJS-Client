@@ -39,9 +39,13 @@ var app = express();
 var tokens = {};
 
 var getLinkFrom = function (links, rel) {
-    return links.find(function (link) {
+    let l = links.find(function (link) {
         return rel === link.rel;
-    }).uri;
+    });
+    if(l) {
+        return l.uri;
+    }
+    return null;
 };
 
 /*
