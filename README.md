@@ -22,11 +22,11 @@ listening on http://localhost:3000
   },
   "clientKey": "YOUR_CLIENT_KEY",
   "clientSecret": "YOUR_CLIENT_SECRET",
-  "platformBaseUri": "https://api.deere.com/platform",
+  "platformBaseUri": "https://sandboxapi.deere.com/platform",
   "authorizeCallbackUri": "http://localhost:3000/callback",
-  "oauthRequestTokenUri": "https://api.deere.com/platform/oauth/request_token",
+  "oauthRequestTokenUri": "https://sandboxapi.deere.com/platform/oauth/request_token",
   "oauthAuthorizeRequestTokenUri": "https://my.deere.com/consentToUseOfData?oauth_token={token}",
-  "oauthAccessTokenUri": "https://api.deere.com/platform/oauth/access_token"
+  "oauthAccessTokenUri": "https://sandboxapi.deere.com/platform/oauth/access_token"
 }
 ----- Ready to authenticate -----
 ```
