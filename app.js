@@ -24,7 +24,7 @@ var config = {
     clientKey: 'PUT_CLIENT_KEY_HERE',
     clientSecret: 'PUT_CLIENT_SECRET_HERE',
 
-    platformBaseUri: 'https://sandboxapi.deere.com/platform',
+    platformBaseUri: 'https://sandboxapi.deere.com/platform/',
     authorizeCallbackUri: 'http://localhost:3000/callback'
 };
 var oAuthSession;
