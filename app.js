@@ -9,11 +9,11 @@ var config = {
 
     /*
      * IMPORTANT: John Deere specific accept header has to be set to have oAuth working with the MyJohnDeere
-     * platform. Othere headers are possible depending on what the endpoint supports.
+     * platform. Other headers are possible depending on what the endpoint supports.
      *
      * IMPORTANT: Be aware of that not all endpoints support all content types. The 'oauth' module from
      * NPM used in this example uses the same accept header for all requests that has been specified
-     * when the oauth session has been created. This means if you explicitly want to hae data from another
+     * when the oauth session has been created. This means if you explicitly want to have data from another
      * endpoint in another content type you would need to establish another oauth session for that content type.
      * (Or use another library or modify the library)
      */
@@ -53,7 +53,7 @@ var getLinkFrom = function (links, rel) {
  *
  * The OAuthSession is initialized without (undefined) requestTokenUri and accessTokenUri as we
  * will get the URIs from the API Catalog. The get request is executed without any
- * accessToken information as we need  to get this during authentication.
+ * accessToken information as we need to get this during authentication.
  *
  * IMPORTANT: In order to get the OAuth working with the MyJohnDeere platform, it is
  * always necessary to set the correct Accept header as configured above!
@@ -169,7 +169,7 @@ app.get('/sampleRequest', function (req, res) {
 });
 
 /*
- * 5. Local endpoint to demonstrate how to perform Create File in a MyJohnDeere organization.Below endpoint just picks up the first organization
+ * 5. Local endpoint to demonstrate how to perform Create File in a MyJohnDeere organization. Below endpoint just picks up the first organization
  * user has access to upload a file and creates (POST) a spot and upload (PUT) a file.
  */
 
