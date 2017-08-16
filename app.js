@@ -147,8 +147,17 @@ app.get('/callback', function (req, res) {
         console.log('StatusCode =>' + results.statusCode);
         console.log(JSON.stringify(tokens, null, 2));
 
-        console.log('----- Ready to do OAuth authenticated calls now-----');
-        res.end();
+        // Refresh API catalog now that we are authorized
+        oAuthSession.get(config.platformBaseUri, tokens.accessToken, tokens.accessTokenSecret, function (error, responseData, result) {
+
+          console.log('----- Refreshing API Catalog -----');
+          console.log('StatusCode =>' + result.statusCode);
+
+          apiCatalog = JSON.parse(responseData);
+
+          console.log('----- Ready to do OAuth authenticated calls now-----');
+          res.end();
+        });
     });
 });
 
@@ -218,19 +227,15 @@ function getFirstOrganizationWithFileUploadAccess(organizationResponseData) {
 app.get('/uploadFile', function (req, res) {
     console.log('----- Doing Create File Request -----');
     res.end();
-    oAuthSession.get(config.platformBaseUri, tokens.accessToken, tokens.accessTokenSecret, function (catalogError, responseData, catalogResult) {
-        apiCatalog = JSON.parse(responseData);
 
-        console.log('Get catalog StatusCode =>' + catalogResult.statusCode);
-        var organizationsLink = getLinkFrom(apiCatalog.links, 'organizations');
+    var organizationsLink = getLinkFrom(apiCatalog.links, 'organizations');
 
-        oAuthSession.get(organizationsLink + ';count=100', tokens.accessToken, tokens.accessTokenSecret, function (error, organizationResponseData, result) {
-            console.log('get Organizations StatusCode =>' + result.statusCode);
+    oAuthSession.get(organizationsLink + ';count=100', tokens.accessToken, tokens.accessTokenSecret, function (error, organizationResponseData, result) {
+        console.log('get Organizations StatusCode =>' + result.statusCode);
 
-            var org = getFirstOrganizationWithFileUploadAccess(organizationResponseData);
+        var org = getFirstOrganizationWithFileUploadAccess(organizationResponseData);
 
-            createAndUploadFile(getLinkFrom(org.links, 'uploadFile'));
-        });
+        createAndUploadFile(getLinkFrom(org.links, 'uploadFile'));
     });
 });
 
