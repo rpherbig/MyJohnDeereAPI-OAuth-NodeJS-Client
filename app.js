@@ -70,7 +70,7 @@ oAuthSession.get(config.platformBaseUri, null, null, function (error, responseDa
     apiCatalog = JSON.parse(responseData);
 
     console.log('----- Getting OAuth URIs from API Catalog -----');
-    console.log('StatusCode =>' + result.statusCode);
+    console.log('StatusCode => ' + result.statusCode);
 
     apiCatalog.links.forEach(function (link) {
         if ('oauthRequestToken' === link.rel) {
@@ -116,7 +116,7 @@ app.get('/oauth', function (req, res) {
         tokens.requestToken = token;
         tokens.requestTokenSecret = secret;
         console.log('----- Request Token and Secret Received -----');
-        console.log('StatusCode =>' + results.statusCode);
+        console.log('StatusCode => ' + results.statusCode);
         console.log(JSON.stringify(tokens, null, 2));
 
         console.log('----- Redirecting to oauthAuthorizeRequestTokenUri -----');
@@ -144,14 +144,13 @@ app.get('/callback', function (req, res) {
         tokens.accessTokenSecret = secret;
 
         console.log('----- Access Token and Secret Received -----');
-        console.log('StatusCode =>' + results.statusCode);
+        console.log('StatusCode => ' + results.statusCode);
         console.log(JSON.stringify(tokens, null, 2));
 
-        // Refresh API catalog now that we are authorized
         oAuthSession.get(config.platformBaseUri, tokens.accessToken, tokens.accessTokenSecret, function (error, responseData, result) {
 
           console.log('----- Refreshing API Catalog -----');
-          console.log('StatusCode =>' + result.statusCode);
+          console.log('StatusCode => ' + result.statusCode);
 
           apiCatalog = JSON.parse(responseData);
 
@@ -169,7 +168,7 @@ app.get('/sampleRequest', function (req, res) {
     console.log('----- Doing Sample Request -----');
 
     oAuthSession.get(getLinkFrom(apiCatalog.links, 'organizations'), tokens.accessToken, tokens.accessTokenSecret, function (error, responseData, result) {
-        console.log('StatusCode =>' + result.statusCode);
+        console.log('StatusCode => ' + result.statusCode);
         console.log('----- Sample Request Response -----');
         console.log(JSON.stringify(JSON.parse(responseData), null, 2));
 
